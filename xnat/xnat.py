@@ -22,8 +22,20 @@ class Xnat:
             "data/projects?accessible=true&users=true&format=csv"
         )
 
+    def list_subjects(self, project):
+        df = self.get_subjects(project)
+        using_labels = {x.label: x.ID for x in df.itertuples()}
+        using_id = {x.ID: x.ID for x in df.itertuples()}
+        return AttrDict({**using_labels, **using_id})
+
     def get_subjects(self, project):
         return self.session.get_df(f"data/projects/{project}/subjects?format=csv")
+
+    def list_experiments(self, project, subject=None):
+        df = self.get_experiments(project, subject)
+        using_labels = {x.label: x.ID for x in df.itertuples()}
+        using_id = {x.ID: x.ID for x in df.itertuples()}
+        return AttrDict({**using_labels, **using_id})
 
     def get_experiments(self, project, subject=None):
         if subject is None:
