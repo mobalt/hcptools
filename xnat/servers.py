@@ -5,6 +5,10 @@ class Server:
     def __init__(self, host):
         self.host = host
 
+    @property
+    def base_url(self):
+        return f"https://{self.host}/"
+
     @classproperty
     def shadow01(cls):
         return cls("hcpi-shadow01.nrg.wustl.edu")
