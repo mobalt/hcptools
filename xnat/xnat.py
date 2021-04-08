@@ -25,6 +25,16 @@ class Xnat:
     def get_subjects(self, project):
         return self.session.get_df(f"data/projects/{project}/subjects?format=csv")
 
+    def get_experiments(self, project, subject=None):
+        if subject is None:
+            return self.session.get_df(
+                f"data/projects/{project}/experiments?format=csv"
+            )
+        else:
+            return self.session.get_df(
+                f"data/projects/{project}/subjects/{subject}/experiments?format=csv"
+            )
+
     def get_resources(self, experiment_id):
         url = f"REST/experiments/{experiment_id}/resources"
         r = self.session.get(url, auth=True)
