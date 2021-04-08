@@ -18,13 +18,10 @@ class XnatSession(Session):
         return super(XnatSession, self).request(method, url, *args, **kwargs)
 
     def login(self):
-        user, password = self.credentials
-        creds = dict(username=user, password=password, login="", XNAT_CSRF="")
-        login_url = f"{self.base_url}/login"
         print(f"Logging in to: {self.base_url}")
 
         try:
-            r = self.post(login_url, data=creds)
+            r = self.post("login", auth=True)
             if r.status_code == 404:
                 print("Server is down. No response.")
                 return None
