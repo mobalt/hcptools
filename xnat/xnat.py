@@ -13,9 +13,17 @@ class Xnat:
     def pcp(self, project, pipeline):
         return PipelineControlPanel(self, project, pipeline)
 
-    def available_projects(self):
-        r = self.session.get("data/projects?accessible=true&users=true&format=json")
-        return AttrDict({x["id"]: x["id"] for x in r.json()["ResultSet"]["Result"]})
+    def list_projects(self):
+        df = self.get_projects()
+        return AttrDict({x: x for x in df.id})
+
+    def get_projects(self):
+        return self.session.get_df(
+            "data/projects?accessible=true&users=true&format=csv"
+        )
+
+    def get_subjects(self, project):
+        return self.session.get_df(f"data/projects/{project}/subjects?format=csv")
 
     def get_resources(self, experiment_id):
         url = f"REST/experiments/{experiment_id}/resources"

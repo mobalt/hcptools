@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 class PipelineControlPanel:
     def __init__(self, xnat_instance, project, pipeline):
         self.xnat = xnat_instance

@@ -1,3 +1,5 @@
+import pandas as pd
+import io
 import re
 from requests.auth import HTTPBasicAuth
 from requests import Session
@@ -16,6 +18,11 @@ class XnatSession(Session):
         if auth:
             kwargs["auth"] = HTTPBasicAuth(*self.credentials)
         return super(XnatSession, self).request(method, url, *args, **kwargs)
+
+    def get_df(self, url, auth=False, *args, **kwargs):
+        r = self.get(url, auth=auth, *args, **kwargs)
+        csv_buffer = io.StringIO(r.content.decode())
+        return pd.read_csv(csv_buffer)
 
     def login(self):
         print(f"Logging in to: {self.base_url}")
