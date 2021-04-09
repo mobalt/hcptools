@@ -71,6 +71,14 @@ class Xnat:
             data=xml,
             headers=headers,
         )
+        # automatically retry once on status 500
+        if r.status_code == 500:
+            r = self.session.put(
+                f"data/projects/{project}/subjects/{subject_label}/experiments/{experiment_label}?xsiType=xnat:mrSessionData",
+                data=xml,
+                headers=headers,
+            )
+
         # status_code 201 - created, 200 - already exists
         assert (
             r.status_code == 201 or r.status_code == 200
