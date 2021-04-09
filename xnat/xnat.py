@@ -63,3 +63,22 @@ class Xnat:
                 "tags",
             ]
         )
+
+    def put_experiment(self, project, subject_label, experiment_label, xml=None):
+        headers = {"Content-Type": "application/xml"}
+        r = self.session.put(
+            f"data/projects/{project}/subjects/{subject_label}/experiments/{experiment_label}?xsiType=xnat:mrSessionData",
+            data=xml,
+            headers=headers,
+        )
+        # status_code 201 - created, 200 - already exists
+        assert (
+            r.status_code == 201 or r.status_code == 200
+        ), "Failure creating experiment."
+        return r.content.decode()
+
+    def experiment_xml(self, project, subject, experiment):
+        r = self.session.get(
+            f"data/projects/{project}/subjects/{subject}/experiments/{experiment}?format=xml&concealHiddenFields=true"
+        )
+        return r.content.decode()
