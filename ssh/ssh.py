@@ -1,3 +1,5 @@
+from io import BytesIO
+
 import paramiko
 from paramiko import SSHClient
 import pandas as pd
@@ -23,7 +25,7 @@ class SSH:
             username=self.username,
             password=self.password,
             *self.args,
-            **self.kwargs
+            **self.kwargs,
         )
         self.client = client
 
@@ -31,6 +33,13 @@ class SSH:
         # Command can be something like "cd /data/intradb && pwd" and result will be "/data/intradb"
         stdin, stdout, stderr = self.client.exec_command(command)
         return stdout.read().decode()
+
+    def write_file(self, content, filename, make_executable=False):
+        ftp = self.client.open_sftp()
+        ftp.putfo(BytesIO(content.encode()), filename)
+        ftp.close()
+        if make_executable:
+            self.client.exec_command(f"chmod +x {filename}")
 
     def qstat(self):
         content = self.exec("qstat -lxfu HCPpipeline")
