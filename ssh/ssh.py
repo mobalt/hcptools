@@ -84,3 +84,11 @@ class SSH:
         df.stdout = df.stdout.str.slice(16)
         df.stderr = df.stderr.str.slice(16)
         return df
+
+    def ls(self, args="", working_dir="."):
+        results = self.exec(f"cd {working_dir} && ls {args}").split("\n")
+
+        # sometimes extra blank lines appear, filter those out
+        results = [x for x in results if x.strip()]
+
+        return results
