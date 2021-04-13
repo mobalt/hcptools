@@ -77,12 +77,13 @@ class SSH:
             )
 
         df = pd.DataFrame(jobs)
-        df.start_time = pd.to_datetime(df.start_time, unit="s")
-        df.created_time = pd.to_datetime(df.created_time, unit="s")
-        df.remaining_time = pd.to_numeric(df.remaining_time) / 3600
+        if len(df):
+            df.start_time = pd.to_datetime(df.start_time, unit="s")
+            df.created_time = pd.to_datetime(df.created_time, unit="s")
+            df.remaining_time = pd.to_numeric(df.remaining_time) / 3600
 
-        df.stdout = df.stdout.str.slice(16)
-        df.stderr = df.stderr.str.slice(16)
+            df.stdout = df.stdout.str.slice(16)
+            df.stderr = df.stderr.str.slice(16)
         return df
 
     def ls(self, args="", working_dir="."):
