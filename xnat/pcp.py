@@ -2,59 +2,53 @@ import pandas as pd
 
 
 class PipelineControlPanel:
-    def __init__(self, xnat_instance, project, pipeline):
+    def __init__(self, xnat_instance, project, pipeline=None):
         self.xnat = xnat_instance
         self.project = project
         self.pipeline = pipeline
-        self.api = f"{self.xnat.base_url}/xapi/pipelineControlPanel/project/{project}/pipeline/{pipeline}"
+        self.api = f"xapi/pipelineControlPanel/project/{project}/pipeline/{pipeline}"
 
     def get_status(self):
-        r = self.session.get(f"{self.api}/status?cached=true&condensed=false")
-        if r.status_code == 200:
-            df = pd.DataFrame(r.json())
-            return df
-        return None
+        return self.xnat.session.get_df_json(
+            f"{self.api}/status?cached=true&condensed=false"
+        )
 
     def update_cache(self, subset):
         endpoint_url = f"{self.api}/updateStatusEntities"
-        entities = subset.fillna("").to_dict("records")
-        r = self.session.post(endpoint_url, json=entities)
-        return r.status_code == 200
+        return self.xnat.session.post_df(endpoint_url, subset)
 
     def set_status_to_reset(self, subset):
         endpoint_url = f"{self.api}/setValues?status=RESET"
-        entities = subset.fillna("").to_dict("records")
-        r = self.session.post(endpoint_url, json=entities)
-        return r.status_code == 200
+        return self.xnat.session.post_df(endpoint_url, subset)
 
     def submit_pipeline(
         self,
         subset,
-        parameters={
-            "queuedLimit": "20",
-            "overrideQueuedLimit": "false",
-            "generateCinabStructure": "false",
-            "resetCurrentActive": "false",
-        },
+        queuedLimit=20,
+        generateCinabStructure=False,
+        overrideQueuedLimit=False,
+        resetCurrentActive=False,
     ):
         endpoint_url = f"{self.api}/pipelineSubmit"
-        entities = subset.fillna("").to_dict("records")
-        payload = dict(entities=entities, parameters=parameters)
-        return self.session.post(endpoint_url, json=payload)
-
-    def get_parameters(self):
-        endpoint_url = f"{self.api}/submitParametersYaml"
-        r = self.session.get(endpoint_url)
-        return r.json()[0]
-
-    def available_projects(self):
-        r = self.session.get(
-            f"{self.base_url}/data/projects?accessible=true&users=true&format=json"
+        parameters = dict(
+            queuedLimit=queuedLimit,
+            overrideQueuedLimit=overrideQueuedLimit,
+            generateCinabStructure=generateCinabStructure,
+            resetCurrentActive=resetCurrentActive,
         )
-        return [x["id"] for x in r.json()["ResultSet"]["Result"]]
-
-    def available_pipelines(self, project="CCF_MDD_STG"):
-        r = self.session.get(
-            f"{self.base_url}/xapi/pipelineControlPanel/project/{project}/statusSummary?includeSubgroupSummary=false"
+        df_as_obj = subset.fillna("").to_dict("records")
+        payload = dict(
+            entities=df_as_obj,
+            parameters=parameters,
         )
-        return pd.DataFrame(r.json())
+        return self.xnat.session.post(endpoint_url, json=payload)
+
+    def get_pipeline_summary(self):
+        return self.xnat.session.get_df_json(
+            f"xapi/pipelineControlPanel/project/{self.project}/statusSummary?includeSubgroupSummary=false"
+        )
+
+    def get_pipeline_settings(self):
+        return self.xnat.session.get_df_json(
+            f"xapi/pipelineControlPanelConfig/{self.project}/pipelines"
+        )

@@ -10,7 +10,7 @@ class Xnat:
         self.session = XnatSession(server.base_url, credentials)
         self.session.login()
 
-    def pcp(self, project, pipeline):
+    def pcp(self, project, pipeline=None):
         return PipelineControlPanel(self, project, pipeline)
 
     def list_projects(self):
