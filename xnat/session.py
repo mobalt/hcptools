@@ -24,6 +24,18 @@ class XnatSession(Session):
         csv_buffer = io.StringIO(r.content.decode())
         return pd.read_csv(csv_buffer)
 
+    def get_df_json(self, url, auth=False, *args, **kwargs):
+        r = self.get(url, auth=auth, *args, **kwargs)
+        return pd.DataFrame(r.json())
+
+    def post_df(self, url, df, auth=False, *args, **kwargs):
+        # fillna is important because json can't deal with pd.NaN
+        json = df.fillna("").to_dict("records")
+        r = self.post(url, json=json)
+        if r.status_code != 200:
+            print("Post not okay: ", url)
+        return r
+
     def login(self):
         print(f"Logging in to: {self.base_url}")
 
