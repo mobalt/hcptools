@@ -37,8 +37,12 @@ class Xnat:
         using_id = {x.ID: x.ID for x in df.itertuples()}
         return AttrDict({**using_labels, **using_id})
 
-    def get_experiments(self, project, subject=None):
-        if subject is None:
+    def get_experiments(self, project=None, subject=None):
+        if project is None:
+            return self.session.get_df(
+                f"data/experiments?format=csv&columns=ID,label,subject_ID,subject_label,project,xsiType,URI"
+            )
+        elif subject is None:
             return self.session.get_df(
                 f"data/projects/{project}/experiments?format=csv&columns=ID,label,subject_ID,subject_label"
             )
