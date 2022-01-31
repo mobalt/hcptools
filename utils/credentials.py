@@ -2,7 +2,7 @@ from subprocess import check_output
 
 
 def get_credentials(site):
-    return (
-        check_output(["pass", "show", f"{site}/username"]).decode().strip(),
-        check_output(["pass", "show", f"{site}/password"]).decode().strip(),
-    )
+    p = check_output(["pass", "show", site]).decode().strip()
+    password, username = p.split("\n")
+    username = username.split(" ")[1]
+    return ( username, password)
