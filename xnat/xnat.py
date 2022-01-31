@@ -94,3 +94,10 @@ class Xnat:
             f"data/projects/{project}/subjects/{subject}/experiments/{experiment}?format=xml&concealHiddenFields=true"
         )
         return r.content.decode()
+
+    def import_experiment(self, project, subject, experiment_label, inbox_path):
+        r = self.session.post(
+            f"data/services/import?import-handler=inbox&rename=true&prevent_anon=true&prevent_auto_commit=true&SOURCE=inbox&autoArchive=AutoArchive&PROJECT_ID={project}&SUBJECT_ID={subject}&EXPT_LABEL={experiment_label}&path={inbox_path}",
+            auth=True
+        )
+        return r
