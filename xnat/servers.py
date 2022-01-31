@@ -10,6 +10,14 @@ class Server:
         return f"https://{self.host}/"
 
     @classproperty
+    def hpc1(cls):
+        return cls("login3-01.chpc.wustl.edu")
+
+    @classproperty
+    def hpc2(cls):
+        return cls("login3-02.chpc.wustl.edu")
+
+    @classproperty
     def shadow01(cls):
         return cls("hcpi-shadow01.nrg.wustl.edu")
 
@@ -84,3 +92,4 @@ class Server:
     @classproperty
     def hodge2(cls):
         return cls("hcpi-dev-hodge2.nrg.wustl.edu")
+
